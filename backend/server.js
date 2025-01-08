@@ -8,7 +8,7 @@ require("dotenv").config();
 
 app.use(cors());
 app.use(express.json());
-console.log("Mongo URI:", process.env.MONGO_URI);
+// console.log("Mongo URI:", process.env.MONGO_URI);
 
 
 mongoose.connect(process.env.MONGO_URI, {
