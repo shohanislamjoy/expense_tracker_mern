@@ -116,7 +116,7 @@ function ForecastChart() {
         7-Day Expense Forecast
       </h2>
       <div className="overflow-x-auto">
-        <div className="relative"> 
+        <div className="relative"  style={{ height: "500px" }}> 
           <Bar data={chartData} options={chartOptions} />
         </div>
       </div>
