@@ -12,7 +12,7 @@ function ExpenseForm({ fetchExpenses, closeForm }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post("http://localhost:5000/api/expenses", formData);
+    await axios.post("/api/expenses", formData);
     fetchExpenses();
     setFormData({
       title: "",

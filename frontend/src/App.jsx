@@ -18,12 +18,12 @@ function App() {
   }, []);
 
   const fetchExpenses = async () => {
-    const res = await axios.get("http://localhost:5000/api/expenses");
+    const res = await axios.get("/api/expenses");
     setExpenses(res.data);
   };
 
   const fetchCategoryData = async () => {
-    const res = await axios.get("http://localhost:5000/api/expenses/categories");
+    const res = await axios.get("/api/expenses/categories");
     setCategoryData(res.data);
   };
 

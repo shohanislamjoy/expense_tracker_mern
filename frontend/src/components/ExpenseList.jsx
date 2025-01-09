@@ -56,7 +56,7 @@ function ExpenseList({ expenses, onEditSuccess, onDeleteSuccess }) {
 
   const handleEditSave = async () => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/expenses/${editExpenseId}`, editExpenseData);
+      const response = await axios.put(`/api/expenses/${editExpenseId}`, editExpenseData);
       if (response.status === 200) {
         onEditSuccess(response.data); // Notify parent to refresh the list
         setEditExpenseId(null); // Exit edit mode
@@ -68,7 +68,7 @@ function ExpenseList({ expenses, onEditSuccess, onDeleteSuccess }) {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`http://localhost:5000/api/expenses/${id}`);
+      const response = await axios.delete(`/api/expenses/${id}`);
       if (response.status === 200) {
         onDeleteSuccess(id); // Notify parent to remove the deleted item
       }
@@ -204,7 +204,7 @@ function ExpenseList({ expenses, onEditSuccess, onDeleteSuccess }) {
         
       ))}
 
-      
+
        {/* Total Expense */}
        <div className="flex justify-end text-xl font-bold text-gray-800 p-4">
         Total Expense: ${totalExpense.toFixed(2)}

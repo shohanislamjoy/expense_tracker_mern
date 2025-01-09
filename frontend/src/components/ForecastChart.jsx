@@ -9,7 +9,7 @@ function ForecastChart() {
 
   useEffect(() => {
     const fetchForecast = async () => {
-      const res = await fetch("http://localhost:5000/api/expenses/forecast");
+      const res = await fetch("/api/expenses/forecast");
       const data = await res.json();
       setForecastData(data.forecast);
     };
