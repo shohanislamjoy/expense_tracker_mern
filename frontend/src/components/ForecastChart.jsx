@@ -17,10 +17,24 @@ function ForecastChart() {
     fetchForecast();
   }, []);
 
- 
   const getDayName = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", { weekday: "long" });
+  };
+
+  // Generate different colors for each day
+  const getDayColor = (dateString) => {
+    const day = new Date(dateString).getDay();
+    const colors = [
+      "rgba(255, 99, 132, 0.6)", // Sunday
+      "rgba(54, 162, 235, 0.6)", // Monday
+      "rgba(255, 159, 64, 0.6)", // Tuesday
+      "rgba(75, 192, 192, 0.6)", // Wednesday
+      "rgba(153, 102, 255, 0.6)", // Thursday
+      "rgba(255, 159, 64, 0.6)", // Friday
+      "rgba(75, 192, 192, 0.6)", // Saturday
+    ];
+    return colors[day];
   };
 
   // Prepare chart data
@@ -32,8 +46,8 @@ function ForecastChart() {
       {
         label: "Predicted Expense ($)",
         data: forecastData.map((day) => day.predictedExpense),
-        backgroundColor: "rgba(54, 162, 235, 0.6)",
-        borderColor: "rgba(54, 162, 235, 1)",
+        backgroundColor: forecastData.map((day) => getDayColor(day.date)), 
+        borderColor: forecastData.map((day) => getDayColor(day.date).replace('0.6', '1')), // Border matching the color
         borderWidth: 1,
       },
     ],
@@ -41,6 +55,7 @@ function ForecastChart() {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false, // Ensures the chart resizes based on the container's width/height
     plugins: {
       legend: {
         position: "top",
@@ -96,12 +111,14 @@ function ForecastChart() {
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 mt-4 max-w-4xl mx-auto">
+    <div className="bg-white shadow-lg rounded-lg p-6 mt-4 max-w-4xl mx-auto">
       <h2 className="text-2xl font-semibold text-gray-700 mb-6 text-center">
         7-Day Expense Forecast
       </h2>
       <div className="overflow-x-auto">
-        <Bar data={chartData} options={chartOptions} />
+        <div className="relative"> 
+          <Bar data={chartData} options={chartOptions} />
+        </div>
       </div>
     </div>
   );
