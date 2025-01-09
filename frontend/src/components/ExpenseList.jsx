@@ -111,10 +111,7 @@ function ExpenseList({ expenses, onEditSuccess, onDeleteSuccess }) {
         </div>
       </div>
 
-      {/* Total Expense */}
-      <div className="text-lg font-semibold text-gray-700 mb-4">
-        Total Expense: ${totalExpense.toFixed(2)}
-      </div>
+     
 
       {/* Expandable Date-Wise List */}
       {Object.keys(groupedExpenses).map((date) => (
@@ -204,7 +201,14 @@ function ExpenseList({ expenses, onEditSuccess, onDeleteSuccess }) {
             </ul>
           )}
         </div>
+        
       ))}
+
+      
+       {/* Total Expense */}
+       <div className="flex justify-end text-xl font-bold text-gray-800 p-4">
+        Total Expense: ${totalExpense.toFixed(2)}
+      </div>
     </div>
   );
 }

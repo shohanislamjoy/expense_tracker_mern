@@ -59,20 +59,7 @@ router.get("/categories", async (req, res) => {
   }
 });
 
-// Predict next 7 days expenses
-router.get("/forecast", async (req, res) => {
-  try {
-    const last7Days = new Date();
-    last7Days.setDate(last7Days.getDate() - 7);
 
-    const expenses = await Expense.find({ date: { $gte: last7Days } });
-    const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-    const forecast = (total / 7) * 7; // Simple forecast logic
-    res.status(200).json({ forecast });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 // Delete an expense by ID
 router.delete("/:id", async (req, res) => {
@@ -106,6 +93,44 @@ router.put("/:id", async (req, res) => {
     }
 
     res.status(200).json(updatedExpense);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+
+router.get("/forecast", async (req, res) => {
+  try {
+    const expenses = await Expense.find();
+
+    // Group expenses by weekday
+    const weekdayTotals = Array(7).fill(0); // Total expense for each weekday
+    const weekdayCounts = Array(7).fill(0); // Count of expenses for each weekday
+
+    expenses.forEach((expense) => {
+      const dayOfWeek = new Date(expense.incurredOn).getDay(); // 0: Sunday, 1: Monday, ..., 6: Saturday
+      weekdayTotals[dayOfWeek] += expense.amount;
+      weekdayCounts[dayOfWeek] += 1;
+    });
+
+    // Calculate average expense for each weekday
+    const weekdayAverages = weekdayTotals.map((total, i) => 
+      weekdayCounts[i] > 0 ? total / weekdayCounts[i] : 0
+    );
+
+    // Predict the next 7 days
+    const forecast = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(Date.now() + i * 24 * 60 * 60 * 1000);
+      const dayOfWeek = date.getDay(); // Get the day of the week
+      return {
+        date: date.toISOString().split("T")[0], // Format date as YYYY-MM-DD
+        predictedExpense: weekdayAverages[dayOfWeek], // Use the average for this day
+      };
+    });
+
+    res.status(200).json({ forecast });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

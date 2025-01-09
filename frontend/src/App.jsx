@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import ExpenseForm from "./components/ExpenseForm";
 import ExpenseList from "./components/ExpenseList";
 import PieChart from "./components/PieChart";
+import Forecast from "./components/ForecastChart";
 
 
 function App() {
@@ -44,17 +45,32 @@ function App() {
     <div className="bg-gray-100 min-h-screen">
       <Header />
       <main className="container mx-auto p-6 space-y-4">
+        {/* Expense Form */}
         <ExpenseForm fetchExpenses={fetchExpenses} />
+  
+        {/* Expense List */}
         <ExpenseList
           expenses={expenses}
           onEditSuccess={handleEditSuccess}
           onDeleteSuccess={handleDeleteSuccess}
         />
-        <PieChart data={categoryData} />
-    
+  
+        {/* Chart Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Forecast Chart */}
+          <div className="bg-white shadow-md rounded p-4 md:col-span-2">
+            <Forecast data={expenses}/>
+          </div>
+  
+          {/* Pie Chart */}
+          <div className="bg-white shadow-md rounded p-4">
+            <PieChart data={categoryData} />
+          </div>
+        </div>
       </main>
     </div>
   );
+  
 }
 
 export default App;

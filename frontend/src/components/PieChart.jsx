@@ -8,13 +8,27 @@ function PieChart({ data }) {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
-  // No filtering needed on pre-aggregated data
+  // Colors
+  const categoryColors = [
+    "#FF6384", 
+    "#36A2EB", 
+    "#FFCE56", 
+    "#4BC0C0", 
+    "#9966FF",
+    "#FF9F40", 
+    "#80D4FF", 
+  ];
+
+  // chart data
   const chartData = {
     labels: Object.keys(data),
     datasets: [
       {
         data: Object.values(data),
-        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
+        backgroundColor: categoryColors.slice(0, Object.keys(data).length),
+        hoverBackgroundColor: categoryColors.slice(0, Object.keys(data).length).map((color) =>
+          color.replace("FF", "DD") // Darken the color for hover effect
+        ),
       },
     ],
   };
@@ -25,16 +39,29 @@ function PieChart({ data }) {
     plugins: {
       legend: {
         position: "top",
+        labels: {
+          font: {
+            size: 14,
+          },
+        },
+      },
+      tooltip: {
+        enabled: true,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        titleColor: "#fff",
+        bodyColor: "#fff",
       },
     },
   };
 
   return (
-    <div className="bg-white shadow-md rounded p-6 mt-4 w-full max-w-xs sm:max-w-md lg:max-w-lg mx-auto" style={{ position: "relative", height: "800px" }}>
-      <h2 className="text-lg font-bold mb-4">Category-wise Expense Chart</h2>
+    <div className="bg-white shadow-md rounded-lg p-6 mt-4 w-full max-w-md sm:max-w-lg lg:max-w-xl mx-auto">
+      <h2 className="text-xl font-bold text-gray-700 mb-4 text-center">
+        Category-wise Expense Chart
+      </h2>
 
-      {/* Date Range Filter */}
-      <div className="flex space-x-4 mb-4">
+      {/* Filter */}
+      <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">Start Date</label>
           <input
@@ -44,7 +71,7 @@ function PieChart({ data }) {
             className="w-full p-2 border rounded"
           />
         </div>
-        <div>
+        <div className="mt-2 sm:mt-0">
           <label className="block text-sm font-medium text-gray-700">End Date</label>
           <input
             type="date"
@@ -55,7 +82,9 @@ function PieChart({ data }) {
         </div>
       </div>
 
-      <Pie data={chartData} options={chartOptions} />
+      <div className="relative h-[300px] sm:h-[400px]">
+        <Pie data={chartData} options={chartOptions} />
+      </div>
     </div>
   );
 }
