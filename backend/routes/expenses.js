@@ -1,8 +1,9 @@
-const express = require("express");
-const Expense = require("../models/Expense");
+import express from "express";
+import Expense from "../models/Expense.js";
+
 const router = express.Router();
 
-
+// Create a new expense
 router.post("/", async (req, res) => {
   try {
     const expense = new Expense(req.body);
@@ -29,12 +30,12 @@ router.get("/by-date", async (req, res) => {
     const expenses = await Expense.aggregate([
       {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$incurredOn" } },
           total: { $sum: "$amount" },
           entries: { $push: "$$ROOT" },
         },
       },
-      { $sort: { _id: 1 } }, // Sort by date ascending
+      { $sort: { _id: 1 } },
     ]);
 
     res.status(200).json(expenses);
@@ -59,7 +60,24 @@ router.get("/categories", async (req, res) => {
   }
 });
 
+// Update an expense by ID
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedExpense = await Expense.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
+    if (!updatedExpense) {
+      return res.status(404).json({ message: "Expense not found" });
+    }
+
+    res.status(200).json(updatedExpense);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Delete an expense by ID
 router.delete("/:id", async (req, res) => {
@@ -77,56 +95,30 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
-
-
-router.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updatedExpense = await Expense.findByIdAndUpdate(id, req.body, {
-      new: true, // Returns the updated document
-      runValidators: true,
-    });
-
-    if (!updatedExpense) {
-      return res.status(404).json({ message: "Expense not found" });
-    }
-
-    res.status(200).json(updatedExpense);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
-
-
+// Predict expenses for the next 7 days
 router.get("/forecast", async (req, res) => {
   try {
     const expenses = await Expense.find();
 
-    // Group expenses by weekday
-    const weekdayTotals = Array(7).fill(0); // Total expense for each weekday
-    const weekdayCounts = Array(7).fill(0); // Count of expenses for each weekday
+    const weekdayTotals = Array(7).fill(0);
+    const weekdayCounts = Array(7).fill(0);
 
     expenses.forEach((expense) => {
-      const dayOfWeek = new Date(expense.incurredOn).getDay(); // 0: Sunday, 1: Monday, ..., 6: Saturday
+      const dayOfWeek = new Date(expense.incurredOn).getDay();
       weekdayTotals[dayOfWeek] += expense.amount;
       weekdayCounts[dayOfWeek] += 1;
     });
 
-    // Calculate average expense for each weekday
-    const weekdayAverages = weekdayTotals.map((total, i) => 
+    const weekdayAverages = weekdayTotals.map((total, i) =>
       weekdayCounts[i] > 0 ? total / weekdayCounts[i] : 0
     );
 
-    // Predict the next 7 days
     const forecast = Array.from({ length: 7 }, (_, i) => {
       const date = new Date(Date.now() + i * 24 * 60 * 60 * 1000);
-      const dayOfWeek = date.getDay(); // Get the day of the week
+      const dayOfWeek = date.getDay();
       return {
-        date: date.toISOString().split("T")[0], // Format date as YYYY-MM-DD
-        predictedExpense: weekdayAverages[dayOfWeek], // Use the average for this day
+        date: date.toISOString().split("T")[0],
+        predictedExpense: weekdayAverages[dayOfWeek],
       };
     });
 
@@ -135,3 +127,5 @@ router.get("/forecast", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+export default router;
