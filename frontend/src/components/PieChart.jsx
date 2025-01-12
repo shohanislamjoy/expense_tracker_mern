@@ -10,25 +10,35 @@ function PieChart({ data }) {
 
   // Colors
   const categoryColors = [
-    "#FF6384", 
-    "#36A2EB", 
-    "#FFCE56", 
-    "#4BC0C0", 
+    "#FF6384",
+    "#36A2EB",
+    "#FFCE56",
+    "#4BC0C0",
     "#9966FF",
-    "#FF9F40", 
-    "#80D4FF", 
+    "#FF9F40",
+    "#80D4FF",
   ];
 
-  // chart data
+  // Filter data based on date range
+  const filteredData = Object.fromEntries(
+    Object.entries(data).filter(([key]) => {
+      const date = new Date(key);
+      const withinStartDate = startDate ? date >= new Date(startDate) : true;
+      const withinEndDate = endDate ? date <= new Date(endDate) : true;
+      return withinStartDate && withinEndDate;
+    })
+  );
+
+  // Chart data
   const chartData = {
-    labels: Object.keys(data),
+    labels: Object.keys(filteredData),
     datasets: [
       {
-        data: Object.values(data),
-        backgroundColor: categoryColors.slice(0, Object.keys(data).length),
-        hoverBackgroundColor: categoryColors.slice(0, Object.keys(data).length).map((color) =>
-          color.replace("FF", "DD") // Darken the color for hover effect
-        ),
+        data: Object.values(filteredData),
+        backgroundColor: categoryColors.slice(0, Object.keys(filteredData).length),
+        hoverBackgroundColor: categoryColors
+          .slice(0, Object.keys(filteredData).length)
+          .map((color) => color.replace("FF", "DD")),
       },
     ],
   };
@@ -40,9 +50,7 @@ function PieChart({ data }) {
       legend: {
         position: "top",
         labels: {
-          font: {
-            size: 14,
-          },
+          font: { size: 14 },
         },
       },
       tooltip: {
@@ -63,7 +71,9 @@ function PieChart({ data }) {
       {/* Filter */}
       <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Start Date</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Start Date
+          </label>
           <input
             type="date"
             value={startDate || ""}
@@ -72,7 +82,9 @@ function PieChart({ data }) {
           />
         </div>
         <div className="mt-2 sm:mt-0">
-          <label className="block text-sm font-medium text-gray-700">End Date</label>
+          <label className="block text-sm font-medium text-gray-700">
+            End Date
+          </label>
           <input
             type="date"
             value={endDate || ""}
